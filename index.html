@@ -1,1 +1,656 @@
-hello world
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS395T: Communicative and Grounded AI Agents - Fall 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        nav {
+            background: #34495e;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        nav a:hover, nav a.active {
+            background: #2c3e50;
+            transform: translateY(-2px);
+        }
+
+        main {
+            padding: 3rem 2rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 1rem auto;
+            border-radius: 2px;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .course-goals {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .goals-list {
+            list-style: none;
+            counter-reset: goal-counter;
+        }
+
+        .goals-list li {
+            counter-increment: goal-counter;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            padding-left: 4rem;
+        }
+
+        .goals-list li::before {
+            content: counter(goal-counter);
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .schedule-table th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .schedule-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .schedule-table tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .paper-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .paper-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.1);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .paper-links a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .unit-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .slides-placeholder {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .slides-placeholder h3 {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            border: none;
+            padding: 0;
+        }
+
+        .slides-placeholder p {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav a {
+                padding: 0.75rem 1rem;
+            }
+
+            main {
+                padding: 2rem 1rem;
+            }
+
+            .schedule-table {
+                font-size: 0.9rem;
+            }
+
+            .schedule-table th,
+            .schedule-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CS395T: Communicative and Grounded AI Agents</h1>
+            <p>UT Austin Computer Science • Fall 2025 </p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#overview" class="nav-link active">Overview</a></li>
+                <li><a href="#schedule" class="nav-link">Schedule</a></li>
+                <li><a href="#slides" class="nav-link">Slides</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div id="overview" class="tab-content active">
+                <h2>Course Overview</h2>
+
+                <p>This course will cover communicative and grounded AI agents; what does that mean?</p>
+
+                <h3>Agents</h3>
+                <p>You'll see over the course of the readings in this course that "agent" can mean a lot of things. At the start of the course, I will ask you to brainstorm what you think are the defining features of an agent, and we'll revisit that same question at the end of the course. For the time being, think of an agent as something that can take actions (these can be in the real world or they can be digital). We'll discuss more exact definitions later.</p>
+
+                <h3>Communicative</h3>
+                <p>By communicative, I mean agents that can not only act but also communicate. Since we'll mostly be dealing with LLMs, that usually means communicating in natural language (generally, English), but we will also see other communication media. We will see agents that communicate both with humans and with other agents.</p>
+
+                <h3>Grounded</h3>
+                <p>This is another word that's hard to pin down and is often used to mean different things. One of the first places this shows up in the CogSci/NLP/AI literature is in <em>The Symbol Grounding Problem</em> (Harnad, 1990); it generally refers to the problem of attaching meaning to something, i.e. how do you know what "apple" means? One way is by "grounding out" to some concrete thing in the world, e.g. an actual apple. Generally, "grounded" in the context of AI means "conditioned on some non-linguistic representation of the environment". For example, multimodal grounding generally refers to language that is grounded to some other modality like vision. However, "grounded" can also refer to something more akin to what "agent" means: something that can take actions in the world.</p>
+
+                <div class="course-goals">
+                    <h3>Goals of the Course</h3>
+                    <p>By the end of the course, you should come away with the following:</p>
+                    <ol class="goals-list">
+                        <li>Understanding the fundamental questions and challenges in developing agents.</li>
+                        <li>An ability to find, assess, and read cutting-edge research. This is an area with extremely rapid progress, so a key goal of the course is to teach you how to stay on top of new research as much as it is to inform you about existing work.</li>
+                        <li>An ability to situate research in historical context. Looking for past work is as important (if not more important) than looking for new work, and can help you in coming up with ideas and understanding where current ideas came from.</li>
+                        <li>Through your projects, you should gain technical abilities in implementing the ideas we discuss in the course.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="schedule" class="tab-content">
+                <h2>Course Schedule</h2>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Date</th>
+                            <th>Unit</th>
+                            <th>Topic</th>
+                            <th>Papers</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body">
+                        <!-- Schedule will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="slides" class="tab-content">
+                <h2>Slides</h2>
+                <div class="slides-placeholder">
+                    <h3>Course Slides</h3>
+                    <p>Slides will be uploaded here as the course progresses. Check back regularly for updates!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Remove active class from all nav links and tab contents
+                    navLinks.forEach(nl => nl.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+
+                    // Add active class to clicked nav link
+                    this.classList.add('active');
+
+                    // Show corresponding tab content
+                    const targetId = this.getAttribute('href').substring(1);
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+
+            // Parse and populate schedule
+            populateSchedule();
+        });
+
+        // Function to get paper title from URL - using predefined titles to avoid CORS issues
+        function getPaperTitle(url) {
+            // Predefined titles for better reliability
+            const paperTitles = {
+                'https://arxiv.org/abs/1810.04805': 'BERT: Pre-training of Deep Bidirectional Transformers',
+                'https://arxiv.org/abs/1706.03762': 'Attention Is All You Need',
+                'https://arxiv.org/abs/2005.14165': 'Language Models are Few-Shot Learners (GPT-3)',
+                'https://arxiv.org/abs/2201.11903': 'Chain-of-Thought Prompting Elicits Reasoning',
+                'https://arxiv.org/abs/2210.03629': 'ReAct: Synergizing Reasoning and Acting in Language Models',
+                'https://dspace.mit.edu/handle/1721.1/7095': 'SHRDLU',
+                'https://cdn.aaai.org/AAAI/1996/AAAI96-156.pdf': 'Learning to Parse Database Queries',
+                'https://arxiv.org/abs/2009.11423': 'Task-Oriented Dialogue as Dataflow Synthesis',
+                'https://aclanthology.org/2021.emnlp-main.608/': 'Constrained Language Models Yield Few-Shot Semantic Parsers',
+                'https://arxiv.org/abs/2302.04761': 'Toolformer: Language Models Can Teach Themselves',
+                'https://arxiv.org/abs/2006.08381': 'DreamCoder: Growing generalizable, interpretable knowledge with wake-sleep Bayesian program learning',
+                'https://arxiv.org/abs/2401.16467': 'ReGAL: Refactoring Programs to Discover Generalizable Abstractions', 
+                'https://arxiv.org/abs/2305.16291': 'Voyager: An Open-Ended Embodied Agent with Large Language Models',
+                'https://arxiv.org/abs/2504.07079': 'SkillWeaver: Web Agents can Self-Improve by Discovering and Honing Skills',
+                'https://arxiv.org/abs/2504.06821': 'Learning Skills from Human Feedback',
+                'https://aclanthology.org/Q13-1005/': 'Weakly Supervised Learning of Semantic Parsers for Mapping Instructions to Actions', 
+                'https://proceedings.neurips.cc/paper_files/paper/2024/hash/e4c61f578ff07830f5c37378dd3ecb0d-Abstract-Conference.html': 'Gorilla: Large Language Model Connected with Massive APIs',
+                'https://arxiv.org/abs/2402.03300': 'DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models',
+                'https://arxiv.org/abs/2505.01441': 'Agentic Reasoning and Tool Integration for LLMs via Reinforcement Learning',
+                'https://arxiv.org/abs/2504.13958v1': 'ToolRL: Reward is All Tool Learning Needs',
+                'https://ojs.aaai.org/index.php/AAAI/article/view/9602': 'Obtaining Well Calibrated Probabilities Using Bayesian Binning',
+                'https://arxiv.org/abs/1706.04599': 'On Calibration of Modern Neural Networks',
+                'https://arxiv.org/abs/2003.07892': 'Calibration of Pre-trained Transformers',
+                'https://direct.mit.edu/tacl/article/doi/10.1162/tacl_a_00598/117737': 'Calibrated Interpretation: Confidence Estimation in Semantic Parsing',
+                'https://arxiv.org/abs/2307.01928': 'Robots That Ask For Help: Uncertainty Alignment for Large Language Model Planners',
+                'https://arxiv.org/abs/2308.08155': 'AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation',
+                'https://www.langchain.com': 'LangChain Documentation',
+                'https://modelcontextprotocol.io/': 'Model Context Protocol',
+                'https://arxiv.org/abs/2503.15703': 'Predicting Multi-Agent Specialization via Task Parallelizability',
+                'https://arxiv.org/abs/2305.14325': 'Improving Factuality and Reasoning in Language Models through Multiagent Debate',
+                'https://arxiv.org/abs/2305.19118': 'Encouraging Divergent Thinking in Large Language Models through Multi-Agent Debate',
+                'https://aclanthology.org/2024.acl-long.381/': 'ReConcile: Round-Table Conference Improves Reasoning via Consensus among Diverse LLMs',
+                'https://arxiv.org/abs/2503.05641': 'Symbolic Mixture-of-Experts: Adaptive Skill-based Routing for Heterogeneous Reasoning',
+                'https://projects.illc.uva.nl/inquisitivesemantics/assets/files/papers/Grice1975.pdf': 'Logic and Conversation (Grice)',
+                'https://langcog.stanford.edu/papers_new/goodman-2016-tics.pdf': 'Pragmatic Language Interpretation as Probabilistic Inference',
+                'https://arxiv.org/abs/2211.08371': 'Pragmatics in Language Grounding: Phenomena, Tasks, and Modeling Approaches',
+                'https://arxiv.org/abs/1711.04987': 'Unified Pragmatic Models for Generating and Following Instructions',
+                'https://arxiv.org/abs/2405.21028': 'LACIE: Listener-Aware Finetuning for Confidence Calibration in Large Language Models',
+                'https://arxiv.org/abs/1908.07490': 'LXMERT: Learning Cross-Modality Encoder Representations from Transformers',
+                'https://arxiv.org/abs/1912.01734': 'ALFRED: A Benchmark for Interpreting Grounded Instructions for Everyday Tasks',
+                'https://arxiv.org/abs/2103.00020': 'Learning Transferable Visual Models From Natural Language Supervision',
+                'https://arxiv.org/abs/2201.12086': 'BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation',
+                'https://arxiv.org/abs/2301.12597': 'BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models',
+                'https://arxiv.org/abs/2106.01345': 'Decision Transformer: Reinforcement Learning via Sequence Modeling',
+                'https://arxiv.org/abs/2212.06817': 'RT-1: Robotics Transformer for Real-World Control at Scale',
+                'https://proceedings.mlr.press/v229/zitkovich23a.html': 'RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control',
+                'https://arxiv.org/abs/2406.09246': 'OpenVLA: An Open-Source Vision-Language-Action Model',
+                'https://wayve.ai/thinking/lingo-2-driving-with-language/': 'LINGO-2: Driving with Language',
+                'https://openaccess.thecvf.com/content/ICCV2023/papers/Suris_ViperGPT_Visual_Inference_via_Python_Execution_for_Reasoning_ICCV_2023_paper.pdf': 'ViperGPT: Visual Inference via Python Execution',
+                'https://arxiv.org/abs/2209.11302': 'ProgPrompt: Generating Situated Robot Task Plans',
+                'https://openaccess.thecvf.com/content/CVPR2023/html/Gupta_Visual_Programming_Compositional_Visual_Reasoning_Without_Training_CVPR_2023_paper.html': 'Visual Programming: Compositional Visual Reasoning',
+                'https://aclanthology.org/N16-1089/': 'Natural Language Communication with Robots',
+                'https://arxiv.org/abs/2307.05973': 'VoxPoser: Composable 3D Value Maps for Robotic Manipulation with Language Models',
+                'https://arxiv.org/abs/2201.07207': 'Language Models as Zero-Shot Planners: Extracting Actionable Knowledge for Embodied Agents',
+                'https://arxiv.org/abs/2204.01691': 'Do As I Can, Not As I Say: Grounding Language in Robotic Affordances',
+                'https://code-as-policies.github.io': 'Code as Policies: Language Model Programs for Embodied Control',
+                'https://arxiv.org/abs/2310.12931': 'Eureka: Human-Level Reward Design via Coding Large Language Models',
+                'https://arxiv.org/abs/2210.03094': 'VIMA: General Robot Manipulation with Multimodal Prompts',
+                'https://arxiv.org/abs/2503.20020': 'Gemini Robotics: Bringing AI into the Physical World',
+                'https://www.physicalintelligence.company/download/pi0.pdf': 'π0: A Vision-Language-Action Flow Model',
+                'https://arxiv.org/abs/2207.01206': 'WebShop: Towards Scalable Real-World Web Interaction with Grounded Language Agents',
+                'https://proceedings.mlr.press/v70/shi17a.html': 'World of Bits: An Open-Domain Platform for Web-Based Agents',
+                'https://arxiv.org/abs/2306.06070': 'Mind2Web: Towards a Generalist Agent for the Web',
+                'https://arxiv.org/abs/2307.13854': 'WebArena: A Realistic Web Environment for Building Autonomous Agents',
+                'https://arxiv.org/abs/2504.01382': 'An Illusion of Progress? Assessing the Current State of Web Agents',
+                'https://arxiv.org/abs/2310.06770': 'SWE-bench: Can Language Models Resolve Real-World Issues?',
+                'https://arxiv.org/abs/2410.03859': 'SWE-bench Multimodal: Do AI Systems Generalize to Visual Software Domains?',
+                'https://arxiv.org/abs/2403.07974': 'LiveCodeBench: Holistic and Contamination Free Evaluation of Large Language Models for Code',
+                'https://proceedings.neurips.cc/paper_files/paper/2024/hash/5a7c947568c1b1328ccc5230172e1e7c-Abstract-Conference.html': 'SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering',
+                'https://arxiv.org/abs/2412.21139': 'Training Software Engineering Agents and Verifiers with SWE-Gym',
+                'https://arxiv.org/abs/2412.14161': 'AgentCompany: Benchmarking LLM Agents on Authentic Company Tasks',
+                'https://arxiv.org/abs/2507.08149': 'Code with Me or for Me? How Increasing AI Automation Transforms Developer Workflows',
+                'https://www.anthropic.com/economic-index': 'AI and the Future of Work: Economic Index',
+                'https://arxiv.org/pdf/2508.13465': 'LM Agents May Fail to Act on Their Own Risk Knowledge',
+                'https://arxiv.org/abs/2311.12983': 'GAIA: a benchmark for General AI Assistants',
+                'https://arxiv.org/abs/2005.11401': 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks',
+                'https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/': 'Agent2Agent Protocol', 
+                'https://arxiv.org/pdf/2506.18096': 'Deep Research Agents: A Systematic Examination And Roadmap',
+                'https://arxiv.org/abs/2504.13079': 'Retrieval-Augmented Generation with Conflicting Evidence',
+                'https://arxiv.org/abs/2310.11511': 'Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection',
+                'https://arxiv.org/abs/2211.07516': 'Rephrasing and Analyzing Ambiguous Questions in VQA', 
+                'https://aclanthology.org/2020.emnlp-main.466/': 'AmbigQA: Answering Ambiguous Open-domain Questions',
+                'https://www.sciencedirect.com/science/article/pii/S0010027711002496': 'The communicative function of ambiguity in language',
+                'https://arxiv.org/abs/2404.12447': 'AmbigDocs: Reasoning across Documents on Different Entities under the Same Name',
+                'https://arxiv.org/abs/2306.00824': 'Zero and Few-shot Semantic Parsing with Ambiguous Inputs',
+                'https://proceedings.neurips.cc/paper_files/paper/2024/hash/a4c942a8405cc910f0a833d28d2573cc-Abstract-Datasets_and_Benchmarks_Track.html': 'AMBROSIA: A Benchmark for Parsing Ambiguous Questions into Database Queries',
+                'https://dl.acm.org/doi/abs/10.1145/302979.303030': 'Principles of mixed-initiative user interfaces',
+                'https://arxiv.org/abs/1805.04655': 'Ranking Clarification Questions using Neural Expected Value of Perfect Information',
+                'https://arxiv.org/abs/2303.16857': 'Did You Mean...? Confidence-based Trade-offs in Semantic Parsing',
+                'https://arxiv.org/abs/2503.22674': 'QuestBench: Can LLMs ask the right question to acquire information in reasoning tasks?',
+                'https://arxiv.org/abs/2405.12063': 'CLAMBER: A Benchmark of Identifying and Clarifying Ambiguous Information Needs in Large Language Models',
+                'https://ojs.aaai.org/index.php/AAAI/article/view/29970': 'Value Kaleidoscope: Engaging AI with Pluralistic Human Values, Rights, and Duties',
+                'https://arxiv.org/abs/2310.17884': 'Can LLMs Keep a Secret? Testing Privacy Implications of Language Models via Contextual Integrity Theory',
+                'https://arxiv.org/pdf/2506.06576': 'Future of Work with AI Agents: Auditing Automation and Augmentation Potential across the U.S. Workforce',
+                'https://www.federalreserve.gov/newsevents/speech/barr20250509a.htm': 'Artificial Intelligence and the Labor Market: A Scenario-Based Approach',
+                'https://arxiv.org/abs/2501.15463v1': 'Mind the Value-Action Gap: Do LLMs Act in Alignment with Their Values?',
+                'https://arxiv.org/abs/2506.06576': 'Future of Work with AI Agents: Auditing Automation and Augmentation Potential across the U.S. Workforce',
+                'https://arxiv.org/pdf/2508.13465': 'LM Agents May Fail to Act on Their Own Risk Knowledge',
+                'https://arxiv.org/abs/2310.17884': 'Can LLMs Keep a Secret? Testing Privacy Implications of Language Models via Contextual Integrity Theory', 
+                'https://aclanthology.org/2024.acl-long.773/': 'Rethinking Persuasion to Challenge AI Safety by Humanizing LLMs',
+                'https://arxiv.org/abs/2411.02391': 'Attacking Vision-Language Computer Agents via Pop-ups'
+            };
+
+            return paperTitles[url] || getFallbackTitle(url);
+        }
+
+        function getFallbackTitle(url) {
+            // Fallback titles based on URL patterns
+            if (url.includes('arxiv.org')) {
+                const paperId = url.match(/(\d{4}\.\d{4,5})/);
+                return paperId ? `ArXiv:${paperId[1]}` : 'ArXiv Paper';
+            } else if (url.includes('aclanthology.org')) {
+                return 'ACL Paper';
+            } else if (url.includes('proceedings.neurips.cc')) {
+                return 'NeurIPS Paper';
+            } else if (url.includes('openreview.net')) {
+                return 'OpenReview Paper';
+            } else if (url.includes('cdn.aaai.org') || url.includes('ojs.aaai.org')) {
+                return 'AAAI Paper';
+            } else if (url.includes('openaccess.thecvf.com')) {
+                return 'CVF Paper';
+            } else if (url.includes('proceedings.mlr.press')) {
+                return 'PMLR Paper';
+            } else if (url.includes('direct.mit.edu/tacl')) {
+                return 'TACL Paper';
+            } else if (url.includes('langchain.com')) {
+                return 'LangChain Documentation';
+            } else if (url.includes('modelcontextprotocol.io')) {
+                return 'Model Context Protocol';
+            } else if (url.includes('code-as-policies.github.io')) {
+                return 'Code as Policies';
+            } else if (url.includes('wayve.ai')) {
+                return 'Wayve Research';
+            } else if (url.includes('physicalintelligence.company')) {
+                return 'Physical Intelligence π0';
+            } else if (url.includes('anthropic.com/economic-index')) {
+                return 'Anthropic Economic Index';
+            } else {
+                return url;
+            }
+        }
+
+        // Schedule data
+        const scheduleData = [
+            {week: 1, date: "8/26/2025", day: "Tuesday", unit: "Intro", topic: "Intro and Overview, Topics covered, Goals, How to read a paper, How to find papers", papers: ""},
+            {week: 1, date: "8/28/2025", day: "Thursday", unit: "Intro", topic: "LLM Background", papers: "https://arxiv.org/abs/1810.04805,https://arxiv.org/abs/1706.03762,https://arxiv.org/abs/2005.14165,https://arxiv.org/abs/2201.11903,https://arxiv.org/abs/2210.03629"},
+            {week: 2, date: "9/2/2025", day: "Tuesday", unit: "LLMs for Action", topic: "Semantic Parsing, Tool Use", papers: "https://dspace.mit.edu/handle/1721.1/7095,https://cdn.aaai.org/AAAI/1996/AAAI96-156.pdf,https://arxiv.org/abs/2009.11423,https://aclanthology.org/2021.emnlp-main.608/,https://arxiv.org/abs/2302.04761"},
+            {week: 2, date: "9/4/2025", day: "Thursday", unit: "LLMs for Action", topic: "Program Induction, Skill Learning", papers: "https://arxiv.org/abs/2006.08381,https://arxiv.org/abs/2305.16291,https://arxiv.org/abs/2401.16467,https://arxiv.org/abs/2504.07079,https://arxiv.org/abs/2504.06821"},
+            {week: 3, date: "9/9/2025", day: "Tuesday", unit: "LLMs for Action", topic: "Learning/Optimization", papers: "https://aclanthology.org/Q13-1005/,https://arxiv.org/abs/2402.03300,https://arxiv.org/abs/2505.01441,https://arxiv.org/abs/2504.13958v1,https://proceedings.neurips.cc/paper_files/paper/2024/hash/e4c61f578ff07830f5c37378dd3ecb0d-Abstract-Conference.html"},
+            {week: 3, date: "9/11/2025", day: "Thursday", unit: "LLMs for Action", topic: "Uncertainty and Calibration", papers: "https://ojs.aaai.org/index.php/AAAI/article/view/9602,https://arxiv.org/abs/1706.04599,https://arxiv.org/abs/2003.07892,https://direct.mit.edu/tacl/article/doi/10.1162/tacl_a_00598/117737,https://arxiv.org/abs/2307.01928"},
+            {week: 4, date: "9/16/2025", day: "Tuesday", unit: "Multi-Agent", topic: "Orchestration/Specialization", papers: "https://arxiv.org/abs/2308.08155,https://www.langchain.com,https://modelcontextprotocol.io/,https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/,https://arxiv.org/abs/2503.15703"},
+            {week: 4, date: "9/18/2025", day: "Thursday", unit: "Multi-Agent", topic: "Debate", papers: "https://arxiv.org/abs/2305.14325,https://arxiv.org/abs/2305.19118,https://aclanthology.org/2024.acl-long.381/,https://arxiv.org/abs/2503.05641"},
+            {week: 5, date: "9/23/2025", day: "Tuesday", unit: "Multi-Agent", topic: "Pragmatics and ToM", papers: "https://projects.illc.uva.nl/inquisitivesemantics/assets/files/papers/Grice1975.pdf,https://langcog.stanford.edu/papers_new/goodman-2016-tics.pdf,https://arxiv.org/abs/1711.04987,https://arxiv.org/abs/2211.08371,https://arxiv.org/abs/2405.21028"},
+            {week: 5, date: "9/25/2025", day: "Thursday", unit: "Embodied/Multimodal", topic: "VLMs and VLAs", papers: "https://arxiv.org/abs/1908.07490,https://arxiv.org/abs/1912.01734,https://arxiv.org/abs/2103.00020,https://arxiv.org/abs/2201.12086,https://arxiv.org/abs/2301.12597,https://arxiv.org/abs/2106.01345,https://arxiv.org/abs/2212.06817,https://proceedings.mlr.press/v229/zitkovich23a.html,https://arxiv.org/abs/2406.09246,https://wayve.ai/thinking/lingo-2-driving-with-language/"},
+            {week: 6, date: "9/30/2025", day: "Tuesday", unit: "Project", topic: "Project Pitch", papers: ""},
+            {week: 6, date: "10/2/2025", day: "Thursday", unit: "Project", topic: "Project Pitch", papers: ""},
+            {week: 7, date: "10/7/2025", day: "Tuesday", unit: "Project", topic: "Project Redteaming", papers: ""},
+            {week: 7, date: "10/9/2025", day: "Thursday", unit: "Embodied/Multimodal", topic: "ViperGPT, Progpropt, Visprog, others", papers: "https://openaccess.thecvf.com/content/ICCV2023/papers/Suris_ViperGPT_Visual_Inference_via_Python_Execution_for_Reasoning_ICCV_2023_paper.pdf,https://arxiv.org/abs/2209.11302,https://openaccess.thecvf.com/content/CVPR2023/html/Gupta_Visual_Programming_Compositional_Visual_Reasoning_Without_Training_CVPR_2023_paper.html"},
+            {week: 8, date: "10/14/2025", day: "Tuesday", unit: "Embodied/Multimodal", topic: "Code as Policy, SayCan, Zero-shot Planning, others", papers: "https://arxiv.org/abs/2201.07207,https://arxiv.org/abs/2204.01691,https://code-as-policies.github.io,https://arxiv.org/abs/2310.12931,https://arxiv.org/abs/2307.05973"},
+            {week: 8, date: "10/16/2025", day: "Thursday", unit: "Embodied/Multimodal", topic: "Robotics, VIMA, Pi, Gemini-Robotics", papers: "https://aclanthology.org/N16-1089/,https://arxiv.org/abs/2210.03094,https://arxiv.org/abs/2503.20020,https://www.physicalintelligence.company/download/pi0.pdf"},
+            {week: 9, date: "10/21/2025", day: "Tuesday", unit: "Computer Use", topic: "Web agents", papers: "https://arxiv.org/abs/2207.01206,https://proceedings.mlr.press/v70/shi17a.html,https://arxiv.org/abs/2306.06070,https://arxiv.org/abs/2307.13854,https://arxiv.org/abs/2504.01382"},
+            {week: 9, date: "10/23/2025", day: "Thursday", unit: "Computer Use", topic: "Code agents", papers: "https://arxiv.org/abs/2310.06770,https://arxiv.org/abs/2410.03859,https://arxiv.org/abs/2403.07974,https://proceedings.neurips.cc/paper_files/paper/2024/hash/5a7c947568c1b1328ccc5230172e1e7c-Abstract-Conference.html,https://arxiv.org/abs/2412.21139"},
+            {week: 10, date: "10/28/2025", day: "Tuesday", unit: "Project", topic: "Mid-term check-in", papers: ""},
+            {week: 10, date: "10/30/2025", day: "Thursday", unit: "Info Agents", topic: "Deep Research", papers: "https://arxiv.org/abs/2005.11401,https://arxiv.org/abs/2311.12983,https://arxiv.org/abs/2310.11511, https://arxiv.org/pdf/2506.18096,https://arxiv.org/abs/2504.13079"},
+            {week: 11, date: "11/4/2025", day: "Tuesday", unit: "Info Agents", topic: "Ambiguity and Underspecification", papers: "https://www.sciencedirect.com/science/article/pii/S0010027711002496,https://arxiv.org/pdf/2211.07516,https://aclanthology.org/2020.emnlp-main.466/,https://arxiv.org/abs/2404.12447,https://arxiv.org/abs/2306.00824,https://proceedings.neurips.cc/paper_files/paper/2024/hash/a4c942a8405cc910f0a833d28d2573cc-Abstract-Datasets_and_Benchmarks_Track.html"},
+            {week: 11, date: "11/6/2025", day: "Thursday", unit: "Info Agents", topic: "Information-seeking (clarification etc.)", papers: "https://dl.acm.org/doi/abs/10.1145/302979.303030,https://arxiv.org/abs/1805.04655,https://arxiv.org/abs/2303.16857,https://arxiv.org/abs/2405.12063,https://arxiv.org/abs/2503.22674"},
+            {week: 12, date: "11/11/2025", day: "Tuesday", unit: "Flex/Special topics", topic: "AgentCompany, etc.", papers: "https://arxiv.org/abs/2412.14161,https://arxiv.org/abs/2507.08149,https://www.anthropic.com/economic-index"},
+            {week: 12, date: "11/13/2025", day: "Thursday", unit: "Flex/special topic", topic: "", papers: ""},
+            {week: 13, date: "11/18/2025", day: "Tuesday", unit: "Ethics/Safety", topic: "", papers: "https://ojs.aaai.org/index.php/AAAI/article/view/29970,https://arxiv.org/abs/2501.15463v1,https://arxiv.org/abs/2506.06576,https://www.federalreserve.gov/newsevents/speech/barr20250509a.htm"},
+            {week: 13, date: "11/20/2025", day: "Thursday", unit: "Project", topic: "Pre-break Check-in", papers: ""},
+            {week: 15, date: "12/2/2025", day: "Tuesday", unit: "Safety", topic: "", papers: "https://aclanthology.org/2024.acl-long.773/, https://arxiv.org/pdf/2508.13465, https://arxiv.org/abs/2411.02391"},
+            {week: 15, date: "12/4/2025", day: "Thursday", unit: "Wrap-up", topic: "Wrap-up and summary", papers: ""},
+            {week: 16, date: "12/9/2025", day: "Tuesday", unit: "Project", topic: "Final Presentations", papers: ""},
+            {week: 16, date: "12/11/2025", day: "Thursday", unit: "Project", topic: "Final Presentations", papers: ""}
+        ];
+
+        function populateSchedule() {
+            const scheduleBody = document.getElementById('schedule-body');
+
+            scheduleData.forEach(row => {
+            const tr = document.createElement('tr');
+
+            // Week
+            const weekTd = document.createElement('td');
+            weekTd.textContent = row.week;
+            tr.appendChild(weekTd);
+
+            // Date
+            const dateTd = document.createElement('td');
+            dateTd.textContent = `${row.date} (${row.day})`;
+            tr.appendChild(dateTd);
+
+            // Unit
+            const unitTd = document.createElement('td');
+            if (row.unit) {
+                const badge = document.createElement('span');
+                badge.className = 'unit-badge';
+                badge.textContent = row.unit;
+                unitTd.appendChild(badge);
+            }
+            tr.appendChild(unitTd);
+
+            // Topic
+            const topicTd = document.createElement('td');
+            topicTd.textContent = row.topic;
+            tr.appendChild(topicTd);
+
+            // Papers
+            const papersTd = document.createElement('td');
+            if (row.papers) {
+                const paperLinks = document.createElement('div');
+                paperLinks.className = 'paper-links';
+
+                const papers = row.papers.split(',').map(p => p.trim()).filter(p => p);
+
+                // Process papers sequentially to avoid rate limiting
+                for (let i = 0; i < papers.length; i++) {
+                    const paperUrl = papers[i];
+                    if (paperUrl) {
+                        const link = document.createElement('a');
+                        link.href = paperUrl;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+
+                        // Set loading text
+                        link.textContent = 'Loading...';
+                        paperLinks.appendChild(link);
+
+                        // Fetch title asynchronously
+                        (async () => {
+                            try {
+                                const title = await getPaperTitle(paperUrl);
+                                link.textContent = title;
+                            } catch (error) {
+                                link.textContent = getFallbackTitle(paperUrl);
+                            }
+                        })();
+
+                        // Add delay between requests to be respectful
+                    }
+                }
+
+                papersTd.appendChild(paperLinks);
+            }
+            tr.appendChild(papersTd);
+
+            scheduleBody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
