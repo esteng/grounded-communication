@@ -351,65 +351,78 @@
     <script>
                 // Function to load slides from assets/slides directory
         // Function to load slides from assets/slides directory
-         async function loadSlides() {
+         // Function to load slides from assets/slides directory
+        async function loadSlides() {
             const slidesList = document.getElementById('slides-list');
             const slidesPlaceholder = document.getElementById('slides-placeholder');
             
             try {
-                // Fetch the directory listing
-                const response = await fetch('assets/slides/');
-                const html = await response.text();
+                console.log('Attempting to fetch manifest from: assets/slides/manifest.json');
                 
-                // Parse the HTML to extract file links
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const links = doc.querySelectorAll('a');
+                // Fetch the manifest file
+                const response = await fetch('assets/slides/manifest.json');
+                console.log('Manifest fetch response:', response.status, response.ok);
                 
-                const slideFiles = [];
-                links.forEach(link => {
-                    const filename = link.getAttribute('href');
-                    if (filename && filename.match(/^\d+-\d+\.(pptx|ppt|pdf)$/)) {
-                        const match = filename.match(/^(\d+)-(\d+)\.(pptx|ppt|pdf)$/);
-                        if (match) {
-                            const month = parseInt(match[1]);
-                            const day = parseInt(match[2]);
-                            slideFiles.push({
-                                filename: filename,
-                                month: month,
-                                day: day,
-                                date: new Date(2025, month - 1, day),
-                                displayName: `${month}/${day}/2025`
-                            });
-                        }
+                if (!response.ok) {
+                    throw new Error(`Manifest fetch failed: ${response.status}`);
+                }
+                
+                const slideFilenames = await response.json();
+                console.log('Loaded manifest with files:', slideFilenames);
+                
+                const foundSlides = [];
+                
+                // Process each slide file from the manifest
+                slideFilenames.forEach(filename => {
+                    // Updated regex to handle leading zeros: 08-26.pptx or 8-26.pptx
+                    const match = filename.match(/^(\d+)-(\d+)\.(pptx|ppt|pdf)$/);
+                    if (match) {
+                        const month = parseInt(match[1]); // parseInt removes leading zeros automatically
+                        const day = parseInt(match[2]);
+                        
+                        
+                        foundSlides.push({
+                            filename: filename,
+                            date: new Date(2025, month - 1, day),
+                            displayName: `${month}/${day}/2025`,
+
+                        });
+                    } else {
+                        console.log('Filename does not match pattern:', filename);
                     }
                 });
                 
-                // Sort by date
-                slideFiles.sort((a, b) => a.date - b.date);
+                console.log('Processed slides:', foundSlides);
                 
-                if (slideFiles.length > 0) {
+                // Sort by date
+                foundSlides.sort((a, b) => a.date - b.date);
+                
+                if (foundSlides.length > 0) {
                     slidesPlaceholder.style.display = 'none';
                     slidesList.className = 'slides-list';
                     
-                    slideFiles.forEach(slide => {
+                    foundSlides.forEach(slide => {
                         const slideItem = document.createElement('div');
                         slideItem.className = 'slide-item';
                         
                         slideItem.innerHTML = `
-                            <h3>Slides - ${slide.displayName}</h3>
+                            <h3>${slide.displayName}</h3>
                             <a href="assets/slides/${slide.filename}" target="_blank" rel="noopener noreferrer">
-                                Download
+                                View Slides
                             </a>
                         `;
                         
                         slidesList.appendChild(slideItem);
                     });
                 } else {
+                    console.log('No valid slides found in manifest');
                     slidesList.style.display = 'none';
                     slidesPlaceholder.style.display = 'block';
                 }
+                
             } catch (error) {
-                // If we can't list the directory, show placeholder
+                // If manifest doesn't exist or there's an error, show placeholder
+                console.error('Error loading slides:', error);
                 slidesList.style.display = 'none';
                 slidesPlaceholder.style.display = 'block';
             }
