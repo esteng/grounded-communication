@@ -19,31 +19,11 @@
             min-height: 100vh;
         }
 
-        .slides-placeholder {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 15px;
-            margin: 2rem 0;
-        }
-
         .container {
             width: 100%;
             margin: 0 auto;
             background: white;
             min-height: 100vh;
-        }
-
-        .slides-placeholder h3 {
-            color: #6c757d;
-            margin-bottom: 1rem;
-            border: none;
-            padding: 0;
-        }
-
-        .slides-placeholder p {
-            color: #6c757d;
-            font-style: italic;
         }
 
         header {
@@ -262,6 +242,32 @@
             transform: translateX(5px);
         }
 
+        .slide-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .slide-links a {
+            color: #bf5700;
+            text-decoration: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(191, 87, 0, 0.1);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .slide-links a:hover {
+            background: #bf5700;
+            color: white;
+            transform: translateX(5px);
+        }
+
         .unit-badge {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -270,53 +276,6 @@
             font-size: 0.8rem;
             font-weight: 600;
             display: inline-block;
-        }
-
-        .slides-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .slide-item {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .slide-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
-
-        .slide-item h3 {
-            color: #bf5700;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            border: none;
-            padding: 0;
-        }
-
-        .slide-item a {
-            display: inline-block;
-            background: linear-gradient(135deg, #bf5700 0%, #a04600 100%);
-            color: white;
-            text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-
-        .slide-item a:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(191, 87, 0, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -349,13 +308,8 @@
 </head>
 <body>
     <script>
-                // Function to load slides from assets/slides directory
         // Function to load slides from assets/slides directory
-         // Function to load slides from assets/slides directory
         async function loadSlides() {
-            const slidesList = document.getElementById('slides-list');
-            const slidesPlaceholder = document.getElementById('slides-placeholder');
-            
             try {
                 console.log('Attempting to fetch manifest from: assets/slides/manifest.json');
                 
@@ -380,12 +334,12 @@
                         const month = parseInt(match[1]); // parseInt removes leading zeros automatically
                         const day = parseInt(match[2]);
                         
-                        
                         foundSlides.push({
                             filename: filename,
                             date: new Date(2025, month - 1, day),
                             displayName: `${month}/${day}/2025`,
-
+                            month: month,
+                            day: day
                         });
                     } else {
                         console.log('Filename does not match pattern:', filename);
@@ -397,38 +351,25 @@
                 // Sort by date
                 foundSlides.sort((a, b) => a.date - b.date);
                 
-                if (foundSlides.length > 0) {
-                    slidesPlaceholder.style.display = 'none';
-                    slidesList.className = 'slides-list';
-                    
-                    foundSlides.forEach(slide => {
-                        const slideItem = document.createElement('div');
-                        slideItem.className = 'slide-item';
-                        
-                        slideItem.innerHTML = `
-                            <h3>${slide.displayName}</h3>
-                            <a href="assets/slides/${slide.filename}" target="_blank" rel="noopener noreferrer">
-                                View Slides
-                            </a>
-                        `;
-                        
-                        slidesList.appendChild(slideItem);
-                    });
-                } else {
-                    console.log('No valid slides found in manifest');
-                    slidesList.style.display = 'none';
-                    slidesPlaceholder.style.display = 'block';
-                }
+                return foundSlides;
                 
             } catch (error) {
-                // If manifest doesn't exist or there's an error, show placeholder
                 console.error('Error loading slides:', error);
-                slidesList.style.display = 'none';
-                slidesPlaceholder.style.display = 'block';
+                return [];
             }
         }
 
-
+        // Function to find matching slides for a given date
+        function findSlidesForDate(slidesData, dateStr) {
+            // Parse the date string (format: "8/26/2025")
+            const dateParts = dateStr.split('/');
+            if (dateParts.length !== 3) return [];
+            
+            const month = parseInt(dateParts[0]);
+            const day = parseInt(dateParts[1]);
+            
+            return slidesData.filter(slide => slide.month === month && slide.day === day);
+        }
     </script>
     <div class="container">
         <header>
@@ -440,7 +381,6 @@
             <ul>
                 <li><a href="#overview" class="nav-link active">Overview</a></li>
                 <li><a href="#schedule" class="nav-link">Schedule</a></li>
-                <li><a href="#slides" class="nav-link">Slides</a></li>
             </ul>
         </nav>
 
@@ -481,23 +421,13 @@
                             <th>Unit</th>
                             <th>Topic</th>
                             <th>Papers</th>
+                            <th>Slides</th>
                         </tr>
                     </thead>
                     <tbody id="schedule-body">
                         <!-- Schedule will be populated by JavaScript -->
                     </tbody>
                 </table>
-            </div>
-
-            <div id="slides" class="tab-content">
-                <h2>Slides</h2>
-                <div id="slides-list">
-                    <!-- Slides will be populated by JavaScript -->
-                </div>
-                <div class="slides-placeholder" id="slides-placeholder">
-                    <h3>Course Slides</h3>
-                    <p>Slides will be uploaded here as the course progresses. Check back regularly for updates!</p>
-                </div>
             </div>
         </main>
     </div>
@@ -527,9 +457,6 @@
 
             // Parse and populate schedule
             populateSchedule();
-            
-            // Load slides
-            loadSlides();
         });
 
         // Function to get paper title from URL - using predefined titles to avoid CORS issues
@@ -684,8 +611,12 @@
             {week: 16, date: "12/11/2025", day: "Thursday", unit: "Project", topic: "Final Presentations", papers: ""}
         ];
 
-        function populateSchedule() {
+        async function populateSchedule() {
             const scheduleBody = document.getElementById('schedule-body');
+            
+            // Load slides data first
+            const slidesData = await loadSlides();
+            console.log('Slides data loaded for schedule:', slidesData);
             
             scheduleData.forEach(row => {
                 if (row.topic !== undefined) { // Add all rows that have a topic field (even if empty)
@@ -742,6 +673,28 @@
                         papersTd.appendChild(paperLinks);
                     }
                     tr.appendChild(papersTd);
+                    
+                    // Slides
+                    const slidesTd = document.createElement('td');
+                    const matchingSlides = findSlidesForDate(slidesData, row.date);
+                    
+                    if (matchingSlides.length > 0) {
+                        const slideLinks = document.createElement('div');
+                        slideLinks.className = 'slide-links';
+                        
+                        matchingSlides.forEach(slide => {
+                            const link = document.createElement('a');
+                            link.href = `assets/slides/${slide.filename}`;
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                            link.textContent = 'Download Slides';
+                            
+                            slideLinks.appendChild(link);
+                        });
+                        
+                        slidesTd.appendChild(slideLinks);
+                    }
+                    tr.appendChild(slidesTd);
                     
                     scheduleBody.appendChild(tr);
                 }
