@@ -329,7 +329,7 @@
                 // Process each slide file from the manifest
                 slideFilenames.forEach(filename => {
                     // Updated regex to handle leading zeros: 08-26.pptx or 8-26.pptx
-                    const match = filename.match(/^(\d+)-(\d+)\.(pptx|ppt|pdf)$/);
+                    const match = filename.match(/^(\d+)-(\d+)\.(pptx|ppt|pdf|html)$/);
                     if (match) {
                         const month = parseInt(match[1]); // parseInt removes leading zeros automatically
                         const day = parseInt(match[2]);
